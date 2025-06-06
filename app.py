@@ -84,5 +84,5 @@ if st.button("Vorschlagen"):
 # === Footer ===
 st.markdown("""
 ---
-🥬 Eine nicht ganz ernst gemeinte App – powered by Rohgang, Moritz & GPT.
+🥬 With love for all Rohgang Enthusiasten 🍯
 """)
