@@ -71,16 +71,6 @@ if st.button("Checken"):
             except Exception as e:
                 st.error(f"Fehler bei der Verarbeitung: {e}")
 
-# === Vorschlag einreichen ===
-st.divider()
-st.subheader("🍽️ Noch was vergessen?")
-user_idea = st.text_input("Reiche ein neues Food ein:", placeholder="z. B. Rinderbrühe mit Knochen")
-if st.button("Vorschlagen"):
-    if user_idea.strip() != "":
-        st.success("Danke! Wurde gespeichert (oder landet bei Moritz im Kopf).")
-    else:
-        st.warning("Bitte gib einen Vorschlag ein.")
-
 # === Footer ===
 st.markdown("""
 ---
