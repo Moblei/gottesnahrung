@@ -77,12 +77,12 @@ if st.button("Checken"):
             except Exception as e:
                 st.error(f"Fehler bei der Verarbeitung: {e}")
 
-# === Share-Ergebnis ===
+# === Share-Ergebnis optimiert ===
 if antwort:
-    st.write("**📢 Teile dein Rohgang-Ergebnis:**")
-    st.code(antwort, language="markdown")
-    st.markdown("🔗 **Kopiere den Text oben und poste ihn direkt auf Insta oder X!**")
-
+    st.write("📢 **Teile dein Rohgang-Ergebnis:**")
+    st.text_area("Klicke hier zum Kopieren:", value=antwort, height=80)
+    st.markdown("🔗 **Kopiere den Text oben und teile ihn auf Instagram oder X!**")
+    
 # === Footer ===
 st.markdown("""
 ---
