@@ -8,29 +8,25 @@ st.set_page_config(page_title="Ist das Gottesnahrung?", layout="centered", page_
 st.title("🥩 Ist das Gottesnahrung?")
 
 # === Load Whitelist & Blacklist ===
-try:
-    with open("whitelist.json", "r", encoding="utf-8") as f:
-        whitelist = json.load(f)
+with open("whitelist.json", "r", encoding="utf-8") as f:
+    whitelist = json.load(f)
 
-    with open("blacklist.json", "r", encoding="utf-8") as f:
-        blacklist = json.load(f)
-except Exception as e:
-    st.error(f"Fehler beim Laden der Listen: {e}")
-    st.stop()
+with open("blacklist.json", "r", encoding="utf-8") as f:
+    blacklist = json.load(f)
 
 # === Vorschläge ===
 vorschlaege = [
     "Protein Pulver Vanille",
     "Tatar mit Eigelb",
     "Rohmilch",
+    "Smacktastic",
+    "Ziegenkäse roh",
     "Booster Apfel",
-    "Clear Whey",
-    "Linsensuppe",
+    "Chia Pudding",
     "Lachs mit Butter"
 ]
 
 eingabe = st.text_input("Gib ein Lebensmittel oder Produkt ein:", placeholder="z. B. Protein Pulver Vanille", value="")
-
 if st.button("Checken"):
     produkt = eingabe.strip().lower()
 
@@ -41,20 +37,18 @@ if st.button("Checken"):
     elif produkt in [item.lower() for item in blacklist]:
         st.error("❌ Auf gar keinen Fall – das schreit nach Industrie und Verirrung.")
     else:
-        with st.spinner("Bewertung durch die Rohkost-Gemeinde läuft..."):
+        with st.spinner("Bewertung durch die Rohgang läuft..."):
             prompt = (
-                f"Ein Nutzer möchte wissen, ob folgendes Produkt 'Gottesnahrung' ist: {eingabe}\n\n"
-                "Antworte aus Sicht eines fanatischen Rohkost-Gurus:\n"
-                "- Nur natürliche, unverarbeitete Lebensmittel sind erlaubt\n"
-                "- Tierische Produkte wie rohe Milch, Eier, Tatar oder Lachs sind ✅, solange naturbelassen\n"
-                "- Pflanzlich ist erlaubt, wenn roh oder naturbelassen – z. B. Salat, rohes Gemüse, Avocado, Beeren\n"
-                "- Zusätze, Fertiggerichte, Industrieprodukte, Süßstoffe, Isolate, künstliche Aromen, Booster, Riegel, Whey etc. = ❌\n"
-                "- Suppen oder warme Gerichte dürfen nur aus natürlichen Zutaten selbst gemacht sein, keine Zusätze oder Tüten\n"
-                "- Samenöle, Margarine, künstliche Zusatzstoffe = ❌\n"
-                "- Humorvoll, ironisch, leicht bissig antworten\n"
-                "Antwort auf Deutsch. Gib zuerst die Kategorie mit Emoji:\n"
-                "✅ Gottesnahrung, 🤔 Vielleicht, ❌ Auf gar keinen Fall\n"
-                "Dann ein witziger 1-2 Zeilen Kommentar im Stil der Rohkost-Gang."
+                f"Ein Nutzer möchte wissen, ob folgendes Produkt 'Gottesnahrung' ist: {eingabe}\n"
+                "Bewerte es aus Sicht eines radikalen Rohkost-Anhängers:\n"
+                "- Natürlich, unverarbeitet, keine Zusätze = ✅\n"
+                "- Hochverarbeitet, industriell, mit Emulgatoren, Zusatzstoffen = ❌\n"
+                "- Pflanzlich ist okay, solange naturbelassen und nicht verarbeitet\n"
+                "- Tierische Produkte wie Eier, Fleisch, Innereien sind okay, wenn möglichst naturbelassen und ohne Zusätze\n"
+                "- Fertiggerichte, Eiweißpulver, Booster, funktionale Drinks = ❌\n"
+                "- Humorvoll, ironisch, leicht überzogen formulieren\n"
+                "Kategorien: ✅ Gottesnahrung, 🤔 Vielleicht, ❌ Auf gar keinen Fall\n"
+                "Antwort auf Deutsch, Emoji + Kategorie zuerst, dann kurzer, witziger Kommentar."
             )
 
             try:
@@ -65,10 +59,9 @@ if st.button("Checken"):
                         {"role": "user", "content": prompt}
                     ],
                     temperature=0.85,
-                    max_tokens=120
+                    max_tokens=100
                 )
                 antwort = response.choices[0].message.content
-
                 if "✅" in antwort:
                     st.success(antwort)
                 elif "❌" in antwort:
@@ -80,5 +73,7 @@ if st.button("Checken"):
                 st.error(f"Fehler bei der Verarbeitung: {e}")
 
 # === Footer ===
-st.markdown("---")
-st.markdown("🍯 #gottesnahrung #rohgang")
+st.markdown("""
+---
+🍯 #gottesnahrung #rohgang
+""")
