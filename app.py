@@ -74,5 +74,5 @@ if st.button("Checken"):
 # === Footer ===
 st.markdown("""
 ---
-🥬 #gottesnahrung #rohgang🍯
+🍯 #gottesnahrung #rohgang
 """)
