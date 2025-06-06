@@ -19,23 +19,28 @@ vorschlaege = [
 st.set_page_config(page_title="Ist das Gottesnahrung?", layout="centered", page_icon="🥩")
 st.markdown("""
     <style>
+    body {
+        background-color: #111;
+        color: white;
+    }
     .result-box {
         padding: 1.2em;
         border-radius: 12px;
         margin-top: 1em;
         font-weight: bold;
         font-size: 1.2em;
+        box-shadow: 0 0 10px rgba(0,0,0,0.2);
     }
     .yes {
-        background-color: #124d24;
+        background-color: #1b5e20;
         color: #d1f5d3;
     }
     .maybe {
-        background-color: #665c00;
-        color: #fff9c4;
+        background-color: #ffeb3b;
+        color: #000;
     }
     .no {
-        background-color: #6e0000;
+        background-color: #b71c1c;
         color: #ffd6d6;
     }
     </style>
@@ -74,11 +79,14 @@ if st.button("Checken"):
                 )
                 antwort = response.choices[0].message.content
                 # Bewertung visuell unterscheiden
-                style_class = "maybe"
                 if "✅" in antwort:
                     style_class = "yes"
                 elif "❌" in antwort or "Auf gar keinen Fall" in antwort:
                     style_class = "no"
+                elif "🤔" in antwort or "Vielleicht" in antwort:
+                    style_class = "maybe"
+                else:
+                    style_class = "maybe"
 
                 st.markdown(f'<div class="result-box {style_class}">{antwort}</div>', unsafe_allow_html=True)
                 st.divider()
