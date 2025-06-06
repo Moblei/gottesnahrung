@@ -7,26 +7,31 @@ openai.api_key = st.secrets["OPENAI_API_KEY"]
 st.set_page_config(page_title="Ist das Gottesnahrung?", layout="centered", page_icon="🥩")
 st.title("🥩 Ist das Gottesnahrung?")
 
-# === Load Whitelist & Blacklist ===
+# === Whitelist & Blacklist laden ===
 with open("whitelist.json", "r", encoding="utf-8") as f:
     whitelist = json.load(f)
 
 with open("blacklist.json", "r", encoding="utf-8") as f:
     blacklist = json.load(f)
 
-# === Vorschläge ===
+# === Vorschläge für schnelleingabe ===
 vorschlaege = [
+    "Rohmilch",
     "Protein Pulver Vanille",
     "Tatar mit Eigelb",
-    "Rohmilch",
-    "Smacktastic",
+    "Linsensuppe",
+    "Pizza Margherita",
+    "More Nutrition Booster",
     "Ziegenkäse roh",
-    "Booster Apfel",
-    "Chia Pudding",
     "Lachs mit Butter"
 ]
 
-eingabe = st.text_input("Gib ein Lebensmittel oder Produkt ein:", placeholder="z. B. Protein Pulver Vanille", value="")
+eingabe = st.text_input(
+    "Gib ein Lebensmittel oder Produkt ein:",
+    placeholder="z. B. Protein Pulver Vanille",
+    value=""
+)
+
 if st.button("Checken"):
     produkt = eingabe.strip().lower()
 
@@ -38,17 +43,18 @@ if st.button("Checken"):
         st.error("❌ Auf gar keinen Fall – das schreit nach Industrie und Verirrung.")
     else:
         with st.spinner("Bewertung durch die Rohgang läuft..."):
+
+            # === Klarer, differenzierter Prompt ===
             prompt = (
                 f"Ein Nutzer möchte wissen, ob folgendes Produkt 'Gottesnahrung' ist: {eingabe}\n"
-                "Bewerte es aus Sicht eines radikalen Rohkost-Anhängers:\n"
-                "- Natürlich, unverarbeitet, keine Zusätze = ✅\n"
-                "- Hochverarbeitet, industriell, mit Emulgatoren, Zusatzstoffen = ❌\n"
-                "- Pflanzlich ist okay, solange naturbelassen und nicht verarbeitet\n"
-                "- Tierische Produkte wie Eier, Fleisch, Innereien sind okay, wenn möglichst naturbelassen und ohne Zusätze\n"
-                "- Fertiggerichte, Eiweißpulver, Booster, funktionale Drinks = ❌\n"
-                "- Humorvoll, ironisch, leicht überzogen formulieren\n"
-                "Kategorien: ✅ Gottesnahrung, 🤔 Vielleicht, ❌ Auf gar keinen Fall\n"
-                "Antwort auf Deutsch, Emoji + Kategorie zuerst, dann kurzer, witziger Kommentar."
+                "Bewerte es aus Sicht eines radikalen, aber humorvollen Rohkost-Gurus:\n"
+                "- Unverarbeitet, naturbelassen, nährstoffreich = ✅ Gottesnahrung\n"
+                "- Hoch verarbeitet, Fertigprodukt, Zusatzstoffe, Industriefood (z. B. Pizza, Booster, Proteinpulver, ESN, Rocka) = ❌ Auf gar keinen Fall\n"
+                "- Pflanzlich ist okay, solange nicht verarbeitet (Samenöle, Margarine, Emulgatoren etc. sind No-Gos)\n"
+                "- Suppe, Salat etc. = 🤔 Vielleicht, je nach Zutaten (nur natürliche erlaubt, keine Samenöle oder Zusatzstoffe)\n"
+                "- Keine Rohkost-Dogmen: Gekochte Eier, Suppen, Fleisch etc. sind ok, wenn pur und sauber\n"
+                "Sprache: Ironisch, direkt, humorvoll – mit Ehre!\n"
+                "Format: Emoji + Kategorie (✅/🤔/❌), dann 1–2 Sätze mit witzigem Kommentar."
             )
 
             try:
@@ -59,9 +65,10 @@ if st.button("Checken"):
                         {"role": "user", "content": prompt}
                     ],
                     temperature=0.85,
-                    max_tokens=100
+                    max_tokens=120
                 )
-                antwort = response.choices[0].message.content
+                antwort = response.choices[0].message.content.strip()
+
                 if "✅" in antwort:
                     st.success(antwort)
                 elif "❌" in antwort:
@@ -73,7 +80,5 @@ if st.button("Checken"):
                 st.error(f"Fehler bei der Verarbeitung: {e}")
 
 # === Footer ===
-st.markdown("""
----
-🍯 #gottesnahrung #rohgang
-""")
+st.markdown("---")
+st.markdown("🍯 #gottesnahrung #rohgang #ehrenernährung")
