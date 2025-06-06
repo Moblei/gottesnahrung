@@ -29,24 +29,18 @@ if st.button("Checken"):
     else:
         with st.spinner("Bewertung wird geladen..."):
             prompt = (
-                   f"Ein Nutzer möchte wissen, ob folgendes Produkt 'Gottesnahrung' ist: {eingabe}\n"
-    "Beurteile aus Sicht eines radikalen Rohkost-Keto-Vertreters:\n"
-    "- Nur naturbelassene tierische Lebensmittel sind wahre Gottesnahrung.\n"
-    "- Alles Verarbeitete (auch Proteinpulver) = ❌\n"
-    "- Marken wie More Nutrition, ESN, Foodspring = ❌\n"
-    "- Sprache: provokant, witzig, mit Haltung.\n"
-    "Antwort auf Deutsch, in einem Satz.\n"
-    "Kategorien: ✅ Gottesnahrung, 🤔 Vielleicht, ❌ Auf gar keinen Fall."
-                "Antwort auf Deutsch, 1–2 Sätze mit Kommentar."
+                f"Beurteile folgendes Lebensmittel: {eingabe}\n"
+                "Ist es Gottesnahrung? Nutze diese Kategorien: ✅ Ja, 🤔 Vielleicht, ❌ Nein."
+                "Antworte kurz, ironisch, mit Rohkost-Keto-Vibe."
             )
             try:
                 response = openai.ChatCompletion.create(
-                    model="gpt-3.5-turbo",
+                    model="gpt-4",
                     messages=[
-                        {"role": "system", "content": "Du bist ein ketogener Rohkost-Purist mit Humor."},
+                        {"role": "system", "content": "Du bist ein ironischer Rohkost-Keto-Experte."},
                         {"role": "user", "content": prompt}
                     ],
-                    temperature=0.85,
+                    temperature=0.8,
                     max_tokens=100
                 )
                 antwort = response.choices[0].message.content
