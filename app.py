@@ -17,6 +17,30 @@ vorschlaege = [
 
 # === App UI ===
 st.set_page_config(page_title="Ist das Gottesnahrung?", layout="centered", page_icon="🥩")
+st.markdown("""
+    <style>
+    .result-box {
+        padding: 1.2em;
+        border-radius: 12px;
+        margin-top: 1em;
+        font-weight: bold;
+        font-size: 1.2em;
+    }
+    .yes {
+        background-color: #124d24;
+        color: #d1f5d3;
+    }
+    .maybe {
+        background-color: #665c00;
+        color: #fff9c4;
+    }
+    .no {
+        background-color: #6e0000;
+        color: #ffd6d6;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 st.title("🥩 Ist das Gottesnahrung?")
 
 # Eingabe mit Vorschlägen
@@ -29,22 +53,34 @@ if st.button("Checken"):
     else:
         with st.spinner("Bewertung wird geladen..."):
             prompt = (
-                f"Beurteile folgendes Lebensmittel: {eingabe}\n"
-                "Ist es Gottesnahrung? Nutze diese Kategorien: ✅ Ja, 🤔 Vielleicht, ❌ Nein."
-                "Antworte kurz, ironisch, mit Rohkost-Keto-Vibe."
+                f"Ein Nutzer möchte wissen, ob folgendes Produkt 'Gottesnahrung' ist: {eingabe}\n"
+                "Beurteile aus Sicht eines radikalen Rohkost-Keto-Vertreters:\n"
+                "- Nur naturbelassene tierische Lebensmittel sind wahre Gottesnahrung.\n"
+                "- Alles Verarbeitete (auch Proteinpulver) = ❌\n"
+                "- Marken wie More Nutrition, ESN, Foodspring = ❌\n"
+                "- Sprache: provokant, witzig, mit Haltung.\n"
+                "Antwort auf Deutsch, in einem Satz.\n"
+                "Kategorien: ✅ Gottesnahrung, 🤔 Vielleicht, ❌ Auf gar keinen Fall."
             )
             try:
                 response = openai.ChatCompletion.create(
-                    model="gpt-4",
+                    model="gpt-3.5-turbo",
                     messages=[
-                        {"role": "system", "content": "Du bist ein ironischer Rohkost-Keto-Experte."},
+                        {"role": "system", "content": "Du bist ein ketogener Rohkost-Purist mit Humor."},
                         {"role": "user", "content": prompt}
                     ],
-                    temperature=0.8,
+                    temperature=0.85,
                     max_tokens=100
                 )
                 antwort = response.choices[0].message.content
-                st.success(antwort)
+                # Bewertung visuell unterscheiden
+                style_class = "maybe"
+                if "✅" in antwort:
+                    style_class = "yes"
+                elif "❌" in antwort or "Auf gar keinen Fall" in antwort:
+                    style_class = "no"
+
+                st.markdown(f'<div class="result-box {style_class}">{antwort}</div>', unsafe_allow_html=True)
                 st.divider()
                 st.markdown("📣 **Teilen?** Kopiere das Ergebnis und teile es auf Insta oder X!")
             except Exception as e:
