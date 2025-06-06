@@ -50,11 +50,12 @@ if st.button("Checken"):
 
 Richtlinien:
 - Erlaubt ✅: Alles, was naturbelassen, roh, ursprünglich ist – z. B. rohes Eigelb, Rohmilch, Tatar, fermentiertes Gemüse, Datteln, Honig, Nüsse, Innereien, tierische Produkte, naturbelassene Pflanzen
-- Vielleicht 🤔: Hausgemachte Dinge mit natürlichen Zutaten, wenn nicht industriell verarbeitet – z. B. gebratener Fisch mit Olivenöl
+- Vielleicht 🤔: Hausgemachte Dinge mit natürlichen Zutaten, wenn nicht industriell verarbeitet – z. B. gebratener Fisch mit Olivenöl, Salate, Suppen
 - Verboten ❌: Alles mit künstlichen Zusätzen, Samenölen (Sonnenblumenöl, Rapsöl etc.), Süßstoffen, Energy Drinks, Proteinpulver, Functional Food, Booster, Fertiggerichte oder Produkte von More Nutrition, ESN, Rocka
 - Zucker = kritisch, außer in Form von Früchten oder Honig
 - Pflanzlich ist okay, solange nicht verarbeitet
 - Sprache: bissig, ironisch, frech
+
 
 Kategorien:  
 ✅ Gottesnahrung  
