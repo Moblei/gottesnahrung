@@ -1,64 +1,70 @@
 import streamlit as st
 import openai
 import json
+import os
 
-# === Konfiguration ===
+# === OpenAI Key aus secrets laden ===
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
-# === Whitelist / Blacklist laden ===
-with open("whitelist.json", "r", encoding="utf-8") as f:
-    whitelist = json.load(f)
-
-with open("blacklist.json", "r", encoding="utf-8") as f:
-    blacklist = json.load(f)
-
-# === App UI ===
+# === Streamlit Setup ===
 st.set_page_config(page_title="Ist das Gottesnahrung?", layout="centered", page_icon="🥩")
 st.title("🥩 Ist das Gottesnahrung?")
 
+# === Eingabe-Feld ===
 eingabe = st.text_input("Gib ein Lebensmittel oder Produkt ein:", placeholder="z. B. Protein Pulver Vanille")
 
+# === Prompt-Vorlage ===
+def build_prompt(food_input):
+    return f"""
+Ein Nutzer fragt, ob folgendes Produkt 'Gottesnahrung' ist: {food_input}
+
+Beurteile es aus Sicht der Rohkost- und Tierprodukt-Elite (à la Rohgang, Coach Aaron). Sei provokant, ironisch und klar.
+
+🔎 Regeln:
+- ✅ Gottesnahrung: Alles, was es schon vor 100 Jahren gab – unverarbeitet, natürlich, tierisch oder pflanzlich. Beispiele: Steak, Eier, Gemüse, fermentiertes Kraut, Brühe, Leber, Olivenöl
+- 🤔 Vielleicht: Pflanzlich, roh, naturbelassen – aber nur, wenn nicht mit komischem Dressing oder Zusätzen gekauft
+- ❌ Kein Gottesnahrung: Industrieprodukte, Proteinpulver, Booster, veganer Käse, Functional Food, Energy-Drinks, Marken wie More, Rocka, ESN
+
+👀 Merksatz: Was dein Urgroßvater als Essen erkannt hätte, ist safe. Alles andere kommt in den gelben Sack.
+
+🎯 Beginne mit einer Kategorie (✅ / 🤔 / ❌), dann 1–2 freche Sätze im TikTok-Rohkost-Guru-Stil.
+
+Optional Hashtags (#gottesnahrung #rohgangapproved)
+"""
+
+# === Bewertung durch OpenAI ===
+def gottes_check(food_input):
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "Du bist ein ironischer Rohkost-Keto-Guru."},
+                {"role": "user", "content": build_prompt(food_input)}
+            ],
+            temperature=0.8,
+            max_tokens=150
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        return f"⚠️ Fehler: {e}"
+
+# === Button zur Ausführung ===
 if st.button("Checken"):
     if eingabe.strip() == "":
-        st.warning("Bitte gib etwas ein.")
+        st.warning("Bitte gib ein Produkt ein.")
     else:
-        eingabe_lower = eingabe.strip().lower()
-
-        if any(term in eingabe_lower for term in whitelist):
-            st.success("✅ Gottesnahrung! Keine Fragen mehr.")
-        elif any(term in eingabe_lower for term in blacklist):
-            st.error("❌ Auf gar keinen Fall. Das ist reine Industriebrühe.")
-        else:
-            with st.spinner("Bewertung wird geladen..."):
-                prompt = (
-                    f"Ein Nutzer fragt, ob folgendes Produkt Gottesnahrung ist: {eingabe}.\n"
-                    "Beurteile aus Sicht der radikalen Rohkost- und Tierprodukt-Fraktion (Rohgang-Style).\n"
-                    "Bewertungskriterien:\n"
-                    "- Tierisch, roh, unverarbeitet = ✅ Gottesnahrung\n"
-                    "- Stark verarbeitet, Industrie, vegane Ersatzprodukte, Samenöle, Booster etc. = ❌ Auf gar keinen Fall\n"
-                    "- Graubereiche oder moderne Fitness-Produkte = 🤔 Vielleicht\n"
-                    "Sprich ironisch, bissig, gerne leicht provokant – als wärst du Teil der Rohkost-Elite auf TikTok.\n"
-                    "Antwortformat: Beginne mit der Kategorie (✅ / 🤔 / ❌), danach 1–2 kurze Sätze Kommentar."
-                )
-
-                try:
-                    response = openai.ChatCompletion.create(
-                        model="gpt-3.5-turbo",
-                        messages=[
-                            {"role": "system", "content": "Du bist ein witziger, radikaler Rohkost-Influencer."},
-                            {"role": "user", "content": prompt}
-                        ],
-                        temperature=0.85,
-                        max_tokens=100
-                    )
-                    antwort = response.choices[0].message.content
-                    st.success(antwort)
-                except Exception as e:
-                    st.error(f"Fehler bei der Verarbeitung: {e}")
-
+        with st.spinner("Bewertung wird geladen..."):
+            ergebnis = gottes_check(eingabe)
+            # Versuche, Emoji und Text zu splitten
+            if ergebnis.startswith("✅"):
+                st.success(ergebnis)
+            elif ergebnis.startswith("❌"):
+                st.error(ergebnis)
+            elif ergebnis.startswith("🤔"):
+                st.warning(ergebnis)
+            else:
+                st.info(ergebnis)
 
 # === Fußzeile ===
-st.markdown("""
----
-🍯 With love für alle Rohkost Warrior 🌱
-""")
+st.markdown("---")
+st.markdown("🌱 Eine ironische App für die Rohkost-Gemeinde. Mit Liebe gebaut von Moritz & GPT.")
