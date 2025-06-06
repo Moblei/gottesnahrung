@@ -46,14 +46,22 @@ if st.button("Checken"):
         with st.spinner("Bewertung durch die Rohgang läuft..."):
             prompt = (
                 f"Ein Nutzer möchte wissen, ob folgendes Produkt 'Gottesnahrung' ist: {eingabe}\n"
-                "Bewerte es aus Sicht eines radikalen Rohkost-Anhängers:\n"
-                "- Roh, tierisch und unverarbeitet = ✅\n"
-                "- Verarbeitet, industriell, mit Zusätzen = ❌\n"
-                "- Pflanzlich okay, solange naturbelassen\n"
-                "- More Nutrition, Booster, Proteinpulver, ESN, Rocka = ❌ absolutes No-Go\n"
-                "- Humorvoll, bissig, ironisch antworten\n"
-                "Kategorien: ✅ Gottesnahrung, 🤔 Vielleicht, ❌ Auf gar keinen Fall\n"
-                "Antwort auf Deutsch, Emoji + Kategorie zuerst, dann kurzer, witziger Kommentar."
+                "Bewerte es aus Sicht eines radikal-rohköstlichen, leicht fanatischen Gottesnahrung-Enthusiasten (Rohgang-Style):
+
+Richtlinien:
+- Erlaubt ✅: Alles, was naturbelassen, roh, ursprünglich ist – z. B. rohes Eigelb, Rohmilch, Tatar, fermentiertes Gemüse, Datteln, Honig, Nüsse, Innereien, tierische Produkte, naturbelassene Pflanzen
+- Vielleicht 🤔: Hausgemachte Dinge mit natürlichen Zutaten, wenn nicht industriell verarbeitet – z. B. gebratener Fisch mit Olivenöl
+- Verboten ❌: Alles mit künstlichen Zusätzen, Samenölen (Sonnenblumenöl, Rapsöl etc.), Süßstoffen, Energy Drinks, Proteinpulver, Functional Food, Booster, Fertiggerichte oder Produkte von More Nutrition, ESN, Rocka
+- Zucker = kritisch, außer in Form von Früchten oder Honig
+- Pflanzlich ist okay, solange nicht verarbeitet
+- Sprache: bissig, ironisch, frech
+
+Kategorien:  
+✅ Gottesnahrung  
+🤔 Vielleicht  
+❌ Auf gar keinen Fall
+
+Antwortformat: Emoji + Kategorie, danach ein kurzer frecher Kommentar auf Deutsch (1–2 Sätze). Kein Disclaimer."
             )
 
             try:
