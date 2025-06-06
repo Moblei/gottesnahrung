@@ -28,12 +28,16 @@ if st.button("Checken"):
         st.warning("Bitte gib etwas ein.")
     else:
         with st.spinner("Bewertung wird geladen..."):
-            prompt = (
-                f"Beurteile folgendes Lebensmittel: {eingabe}\n"
-                "Ist es Gottesnahrung? Nutze diese Kategorien: ✅ Ja, 🤔 Vielleicht, ❌ Nein."
-                "Antworte kurz, ironisch, mit Rohkost-Keto-Vibe."
-            )
-            try:
+prompt = (
+    f"Ein Nutzer möchte wissen, ob folgendes Produkt 'Gottesnahrung' ist: {eingabe}\n"
+    "Bewerte das Lebensmittel aus Sicht der rohköstlichen Elite:\n"
+    "- Tierisch = gut\n"
+    "- Verarbeitet = kritisch\n"
+    "- More Nutrition, ESN, Booster etc. = definitiv No\n"
+    "- Die Sprache soll witzig, ironisch, leicht aggressiv sein\n"
+    "Kategorien: ✅ Gottesnahrung, 🤔 Vielleicht, ❌ Auf gar keinen Fall\n"
+    "Antwort auf Deutsch, 1–2 Sätze mit Kommentar."
+)            try:
                 response = openai.ChatCompletion.create(
                     model="gpt-3.5-turbo",
                     messages=[
