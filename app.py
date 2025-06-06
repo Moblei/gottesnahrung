@@ -28,23 +28,24 @@ if st.button("Checken"):
         st.warning("Bitte gib etwas ein.")
     else:
         with st.spinner("Bewertung wird geladen..."):
-prompt = (
-    f"Ein Nutzer möchte wissen, ob folgendes Produkt 'Gottesnahrung' ist: {eingabe}\n"
-    "Bewerte das Lebensmittel aus Sicht der rohköstlichen Elite:\n"
-    "- Tierisch = gut\n"
-    "- Verarbeitet = kritisch\n"
-    "- More Nutrition, ESN, Booster etc. = definitiv No\n"
-    "- Die Sprache soll witzig, ironisch, leicht aggressiv sein\n"
-    "Kategorien: ✅ Gottesnahrung, 🤔 Vielleicht, ❌ Auf gar keinen Fall\n"
-    "Antwort auf Deutsch, 1–2 Sätze mit Kommentar."
-)            try:
+            prompt = (
+                f"Ein Nutzer möchte wissen, ob folgendes Produkt 'Gottesnahrung' ist: {eingabe}\n"
+                "Bewerte das Lebensmittel aus Sicht der rohköstlichen Elite:\n"
+                "- Tierisch = gut\n"
+                "- Verarbeitet = kritisch\n"
+                "- More Nutrition, ESN, Booster etc. = definitiv No\n"
+                "- Die Sprache soll witzig, ironisch, leicht aggressiv sein\n"
+                "Kategorien: ✅ Gottesnahrung, 🤔 Vielleicht, ❌ Auf gar keinen Fall\n"
+                "Antwort auf Deutsch, 1–2 Sätze mit Kommentar."
+            )
+            try:
                 response = openai.ChatCompletion.create(
                     model="gpt-3.5-turbo",
                     messages=[
-                        {"role": "system", "content": "Du bist ein ironischer Rohkost-Keto-Experte."},
+                        {"role": "system", "content": "Du bist ein ketogener Rohkost-Purist mit Humor."},
                         {"role": "user", "content": prompt}
                     ],
-                    temperature=0.8,
+                    temperature=0.85,
                     max_tokens=100
                 )
                 antwort = response.choices[0].message.content
