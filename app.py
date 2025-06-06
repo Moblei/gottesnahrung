@@ -29,13 +29,14 @@ if st.button("Checken"):
     else:
         with st.spinner("Bewertung wird geladen..."):
             prompt = (
-                f"Ein Nutzer möchte wissen, ob folgendes Produkt 'Gottesnahrung' ist: {eingabe}\n"
-                "Bewerte das Lebensmittel aus Sicht der rohköstlichen Elite:\n"
-                "- Tierisch = gut\n"
-                "- Verarbeitet = kritisch\n"
-                "- More Nutrition, ESN, Booster etc. = definitiv No\n"
-                "- Die Sprache soll witzig, ironisch, leicht aggressiv sein\n"
-                "Kategorien: ✅ Gottesnahrung, 🤔 Vielleicht, ❌ Auf gar keinen Fall\n"
+                   f"Ein Nutzer möchte wissen, ob folgendes Produkt 'Gottesnahrung' ist: {eingabe}\n"
+    "Beurteile aus Sicht eines radikalen Rohkost-Keto-Vertreters:\n"
+    "- Nur naturbelassene tierische Lebensmittel sind wahre Gottesnahrung.\n"
+    "- Alles Verarbeitete (auch Proteinpulver) = ❌\n"
+    "- Marken wie More Nutrition, ESN, Foodspring = ❌\n"
+    "- Sprache: provokant, witzig, mit Haltung.\n"
+    "Antwort auf Deutsch, in einem Satz.\n"
+    "Kategorien: ✅ Gottesnahrung, 🤔 Vielleicht, ❌ Auf gar keinen Fall."
                 "Antwort auf Deutsch, 1–2 Sätze mit Kommentar."
             )
             try:
