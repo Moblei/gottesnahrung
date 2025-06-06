@@ -1,2 +1,2 @@
-[default]
-OPENAI_API_KEY = "dein-openai-api-key-hier"
+streamlit
+openai
