@@ -56,19 +56,9 @@ if st.button("Checken"):
                 except Exception as e:
                     st.error(f"Fehler bei der Verarbeitung: {e}")
 
-# === Vorschlag einreichen ===
-st.divider()
-st.subheader("🍽️ Fehlt ein Lebensmittel?")
-user_idea = st.text_input("Reiche dein Food ein:", placeholder="z. B. Smacktastic Brotaufstrich")
-if st.button("Vorschlagen"):
-    if user_idea.strip() != "":
-        st.success("Danke! Dein Vorschlag wurde gespeichert (oder an den Entwickler übermittelt).")
-    else:
-        st.warning("Bitte gib einen Vorschlag ein.")
 
 # === Fußzeile ===
 st.markdown("""
 ---
-🌱 Eine ironisch gemeinte App rund um Rohkost, Keto und TikTok-Kultur.  
-Entwickelt mit Liebe von Moritz & GPT.
+🍯 With love für alle Rohkost Warrior 🌱
 """)
