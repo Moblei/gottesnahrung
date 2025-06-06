@@ -2,40 +2,20 @@ import streamlit as st
 import openai
 import json
 
-# === Setup ===
-openai.api_key = st.secrets["OPENAI_API_KEY"]
-st.set_page_config(page_title="Ist das Gottesnahrung?", layout="centered", page_icon="🥩")
-st.title("🥩 Ist das Gottesnahrung?")
+# (Alles wie bisher, oben)
 
-# === Load Whitelist & Blacklist ===
-with open("whitelist.json", "r", encoding="utf-8") as f:
-    whitelist = json.load(f)
-
-with open("blacklist.json", "r", encoding="utf-8") as f:
-    blacklist = json.load(f)
-
-# === Vorschläge ===
-vorschlaege = [
-    "Protein Pulver Vanille",
-    "Tatar mit Eigelb",
-    "Rohmilch",
-    "Smacktastic",
-    "Ziegenkäse roh",
-    "Booster Apfel",
-    "Chia Pudding",
-    "Lachs mit Butter"
-]
-
-eingabe = st.text_input("Gib ein Lebensmittel oder Produkt ein:", placeholder="z. B. Protein Pulver Vanille", value="")
+antwort = None
 if st.button("Checken"):
     produkt = eingabe.strip().lower()
 
     if produkt == "":
         st.warning("Bitte gib etwas ein.")
     elif produkt in [item.lower() for item in whitelist]:
-        st.success("✅ Gottesnahrung – approved von der Rohgang. Ehre, wer Ehre verdient.")
+        antwort = "✅ Gottesnahrung – approved von der Rohgang. Ehre, wer Ehre verdient."
+        st.success(antwort)
     elif produkt in [item.lower() for item in blacklist]:
-        st.error("❌ Auf gar keinen Fall – das schreit nach Industrie und Verirrung.")
+        antwort = "❌ Auf gar keinen Fall – das schreit nach Industrie und Verirrung."
+        st.error(antwort)
     else:
         with st.spinner("Bewertung durch die Rohgang läuft..."):
             prompt = (
@@ -70,6 +50,14 @@ if st.button("Checken"):
 
             except Exception as e:
                 st.error(f"Fehler bei der Verarbeitung: {e}")
+
+# === Share Button mit einfacher Kopier-Funktion ===
+if antwort:
+    st.write("**📢 Teile dein Rohgang-Ergebnis:**")
+    st.code(antwort, language="markdown")
+
+    # Call-to-Action für Kopieren (leicht zu kopieren)
+    st.markdown("🔗 **Kopiere den Text oben und poste ihn direkt auf Insta oder X!**")
 
 # === Footer ===
 st.markdown("""
