@@ -2,9 +2,35 @@ import streamlit as st
 import openai
 import json
 
-# (Alles wie bisher, oben)
+# === Setup ===
+openai.api_key = st.secrets["OPENAI_API_KEY"]
+st.set_page_config(page_title="Ist das Gottesnahrung?", layout="centered", page_icon="🥩")
+st.title("🥩 Ist das Gottesnahrung?")
 
-antwort = None
+# === Load Whitelist & Blacklist ===
+with open("whitelist.json", "r", encoding="utf-8") as f:
+    whitelist = json.load(f)
+
+with open("blacklist.json", "r", encoding="utf-8") as f:
+    blacklist = json.load(f)
+
+# === Vorschläge ===
+vorschlaege = [
+    "Protein Pulver Vanille",
+    "Tatar mit Eigelb",
+    "Rohmilch",
+    "Smacktastic",
+    "Ziegenkäse roh",
+    "Booster Apfel",
+    "Chia Pudding",
+    "Lachs mit Butter"
+]
+
+# === Eingabe ===
+eingabe = st.text_input("Gib ein Lebensmittel oder Produkt ein:", placeholder="z. B. Protein Pulver Vanille", value="")
+antwort = ""
+
+# === Bewertung ===
 if st.button("Checken"):
     produkt = eingabe.strip().lower()
 
@@ -51,12 +77,10 @@ if st.button("Checken"):
             except Exception as e:
                 st.error(f"Fehler bei der Verarbeitung: {e}")
 
-# === Share Button mit einfacher Kopier-Funktion ===
+# === Share-Ergebnis ===
 if antwort:
     st.write("**📢 Teile dein Rohgang-Ergebnis:**")
     st.code(antwort, language="markdown")
-
-    # Call-to-Action für Kopieren (leicht zu kopieren)
     st.markdown("🔗 **Kopiere den Text oben und poste ihn direkt auf Insta oder X!**")
 
 # === Footer ===
