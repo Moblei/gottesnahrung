@@ -24,24 +24,27 @@ st.markdown("""
         color: white;
     }
     .result-box {
-        padding: 1.2em;
+        padding: 1em;
         border-radius: 12px;
-        margin-top: 1em;
-        font-weight: bold;
-        font-size: 1.2em;
-        box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        margin-top: 1.5em;
+        font-size: 1.1em;
+        background-color: #1e1e1e;
+        color: white;
+        border-left: 6px solid;
     }
     .yes {
-        background-color: #1b5e20;
-        color: #d1f5d3;
+        border-color: #4caf50;
     }
     .maybe {
-        background-color: #ffeb3b;
-        color: #000;
+        border-color: #ffc107;
     }
     .no {
-        background-color: #b71c1c;
-        color: #ffd6d6;
+        border-color: #f44336;
+    }
+    .category-label {
+        font-weight: bold;
+        margin-bottom: 0.3em;
+        font-size: 1.2em;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -81,14 +84,20 @@ if st.button("Checken"):
                 # Bewertung visuell unterscheiden
                 if "✅" in antwort:
                     style_class = "yes"
+                    kategorie = "✅ Gottesnahrung"
                 elif "❌" in antwort or "Auf gar keinen Fall" in antwort:
                     style_class = "no"
+                    kategorie = "❌ Auf gar keinen Fall"
                 elif "🤔" in antwort or "Vielleicht" in antwort:
                     style_class = "maybe"
+                    kategorie = "🤔 Vielleicht"
                 else:
                     style_class = "maybe"
+                    kategorie = "🤔 Vielleicht"
 
-                st.markdown(f'<div class="result-box {style_class}">{antwort}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="result-box {style_class}">'
+                            f'<div class="category-label">{kategorie}</div>'
+                            f'{antwort}</div>', unsafe_allow_html=True)
                 st.divider()
                 st.markdown("📣 **Teilen?** Kopiere das Ergebnis und teile es auf Insta oder X!")
             except Exception as e:
