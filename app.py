@@ -1,70 +1,88 @@
 import streamlit as st
 import openai
 import json
-import os
 
-# === OpenAI Key aus secrets laden ===
+# === Setup ===
 openai.api_key = st.secrets["OPENAI_API_KEY"]
-
-# === Streamlit Setup ===
 st.set_page_config(page_title="Ist das Gottesnahrung?", layout="centered", page_icon="🥩")
 st.title("🥩 Ist das Gottesnahrung?")
 
-# === Eingabe-Feld ===
-eingabe = st.text_input("Gib ein Lebensmittel oder Produkt ein:", placeholder="z. B. Protein Pulver Vanille")
+# === Load Whitelist & Blacklist ===
+with open("whitelist.json", "r", encoding="utf-8") as f:
+    whitelist = json.load(f)
 
-# === Prompt-Vorlage ===
-def build_prompt(food_input):
-    return f"""
-Ein Nutzer fragt, ob folgendes Produkt 'Gottesnahrung' ist: {food_input}
+with open("blacklist.json", "r", encoding="utf-8") as f:
+    blacklist = json.load(f)
 
-Beurteile es aus Sicht der Rohkost- und Tierprodukt-Elite (à la Rohgang, Coach Aaron). Sei provokant, ironisch und klar.
+# === Vorschläge ===
+vorschlaege = [
+    "Protein Pulver Vanille",
+    "Tatar mit Eigelb",
+    "Rohmilch",
+    "Smacktastic",
+    "Ziegenkäse roh",
+    "Booster Apfel",
+    "Chia Pudding",
+    "Lachs mit Butter"
+]
 
-🔎 Regeln:
-- ✅ Gottesnahrung: Alles, was es schon vor 100 Jahren gab – unverarbeitet, natürlich, tierisch oder pflanzlich. Beispiele: Steak, Eier, Gemüse, fermentiertes Kraut, Brühe, Leber, Olivenöl
-- 🤔 Vielleicht: Pflanzlich, roh, naturbelassen – aber nur, wenn nicht mit komischem Dressing oder Zusätzen gekauft
-- ❌ Kein Gottesnahrung: Industrieprodukte, Proteinpulver, Booster, veganer Käse, Functional Food, Energy-Drinks, Marken wie More, Rocka, ESN
-
-👀 Merksatz: Was dein Urgroßvater als Essen erkannt hätte, ist safe. Alles andere kommt in den gelben Sack.
-
-🎯 Beginne mit einer Kategorie (✅ / 🤔 / ❌), dann 1–2 freche Sätze im TikTok-Rohkost-Guru-Stil.
-
-Optional Hashtags (#gottesnahrung #rohgangapproved)
-"""
-
-# === Bewertung durch OpenAI ===
-def gottes_check(food_input):
-    try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "Du bist ein ironischer Rohkost-Keto-Guru."},
-                {"role": "user", "content": build_prompt(food_input)}
-            ],
-            temperature=0.8,
-            max_tokens=150
-        )
-        return response.choices[0].message.content.strip()
-    except Exception as e:
-        return f"⚠️ Fehler: {e}"
-
-# === Button zur Ausführung ===
+eingabe = st.text_input("Gib ein Lebensmittel oder Produkt ein:", placeholder="z. B. Protein Pulver Vanille", value="")
 if st.button("Checken"):
-    if eingabe.strip() == "":
-        st.warning("Bitte gib ein Produkt ein.")
-    else:
-        with st.spinner("Bewertung wird geladen..."):
-            ergebnis = gottes_check(eingabe)
-            # Versuche, Emoji und Text zu splitten
-            if ergebnis.startswith("✅"):
-                st.success(ergebnis)
-            elif ergebnis.startswith("❌"):
-                st.error(ergebnis)
-            elif ergebnis.startswith("🤔"):
-                st.warning(ergebnis)
-            else:
-                st.info(ergebnis)
+    produkt = eingabe.strip().lower()
 
-# === Fußzeile ===
-st.markdown("---")
-st.markdown("🌱 Eine ironische App für die Rohkost-Gemeinde. Mit Liebe gebaut von Moritz & GPT.")
+    if produkt == "":
+        st.warning("Bitte gib etwas ein.")
+    elif produkt in [item.lower() for item in whitelist]:
+        st.success("✅ Gottesnahrung – approved von der Rohgang. Ehre, wer Ehre verdient.")
+    elif produkt in [item.lower() for item in blacklist]:
+        st.error("❌ Auf gar keinen Fall – das schreit nach Industrie und Verirrung.")
+    else:
+        with st.spinner("Bewertung durch die Rohgang läuft..."):
+            prompt = (
+                f"Ein Nutzer möchte wissen, ob folgendes Produkt 'Gottesnahrung' ist: {eingabe}\n"
+                "Bewerte es aus Sicht eines radikalen Rohkost-Anhängers:\n"
+                "- Roh, tierisch und unverarbeitet = ✅\n"
+                "- Verarbeitet, industriell, mit Zusätzen = ❌\n"
+                "- Pflanzlich okay, solange naturbelassen\n"
+                "- More Nutrition, Booster, Proteinpulver, ESN, Rocka = ❌ absolutes No-Go\n"
+                "- Humorvoll, bissig, ironisch antworten\n"
+                "Kategorien: ✅ Gottesnahrung, 🤔 Vielleicht, ❌ Auf gar keinen Fall\n"
+                "Antwort auf Deutsch, Emoji + Kategorie zuerst, dann kurzer, witziger Kommentar."
+            )
+
+            try:
+                response = openai.ChatCompletion.create(
+                    model="gpt-3.5-turbo",
+                    messages=[
+                        {"role": "system", "content": "Du bist ein fanatischer, ironischer Rohkost-Guru."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    temperature=0.85,
+                    max_tokens=100
+                )
+                antwort = response.choices[0].message.content
+                if "✅" in antwort:
+                    st.success(antwort)
+                elif "❌" in antwort:
+                    st.error(antwort)
+                else:
+                    st.warning(antwort)
+
+            except Exception as e:
+                st.error(f"Fehler bei der Verarbeitung: {e}")
+
+# === Vorschlag einreichen ===
+st.divider()
+st.subheader("🍽️ Noch was vergessen?")
+user_idea = st.text_input("Reiche ein neues Food ein:", placeholder="z. B. Rinderbrühe mit Knochen")
+if st.button("Vorschlagen"):
+    if user_idea.strip() != "":
+        st.success("Danke! Wurde gespeichert (oder landet bei Moritz im Kopf).")
+    else:
+        st.warning("Bitte gib einen Vorschlag ein.")
+
+# === Footer ===
+st.markdown("""
+---
+🥬 Eine nicht ganz ernst gemeinte App – powered by Rohgang, Moritz & GPT.
+""")
