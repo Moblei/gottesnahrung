@@ -4,91 +4,102 @@ import openai
 # === Konfiguration ===
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
-# === Whitelist & Blacklist ===
-whitelist = [
-    "rohmilch", "rohe leber", "rindertatar", "eigelb", "knochenmark",
-    "milz", "zunge", "weide-eier", "rohe butter", "roher fisch",
-    "honig", "rohkostgemüse", "kimchi", "sauerkraut"
+# === Whitelist & Blacklist (harte Regeln) ===
+WHITELIST = [
+    "rohmilch", "rohmilchkäse", "ziegenmilch", "tatar", "rindertatar", "leber", "eigelb",
+    "knochenbrühe", "fermentiertes gemüse", "sauerkraut", "kimchi", "butter", "ghee", "schmalz",
+    "tierisches fett", "wildlachs", "sardinen", "makrele", "rohe eier"
 ]
 
-blacklist = [
-    "proteinpulver", "clear whey", "smacktastic", "booster", "esn",
-    "more nutrition", "rocka", "aspartam", "sucralose",
-    "fertiggerichte", "margarine", "sonnenblumenöl", "vegane wurst"
+BLACKLIST = [
+    "more nutrition", "esn", "rocka", "proteinpulver", "clear whey", "booster",
+    "energy drink", "smacktastic", "veganer fleischersatz", "soja", "fertigprodukt",
+    "riegel", "gummibärchen", "tütensuppe", "functional water", "süßstoff", "emulgator",
+    "aroma", "künstlich", "pflanzliches eiweiß", "sojaprotein"
 ]
 
 # === App UI ===
 st.set_page_config(page_title="Ist das Gottesnahrung?", layout="centered", page_icon="🥩")
 st.title("🥩 Ist das Gottesnahrung?")
 
+# Eingabe
 eingabe = st.text_input("Gib ein Lebensmittel oder Produkt ein:", placeholder="z. B. Protein Pulver Vanille")
 
+# Check-Funktion
 if st.button("Checken"):
     if eingabe.strip() == "":
         st.warning("Bitte gib etwas ein.")
     else:
-        with st.spinner("Bewertung wird geladen..."):
+        clean_input = eingabe.strip().lower()
 
-            # === System-Prompt mit Listen ===
-            system_prompt = f"""
-Du bist ein ketogener Rohkost-Guru mit klarer Meinung.
+        # Harte Regel: Blacklist
+        if any(item in clean_input for item in BLACKLIST):
+            st.error("❌ Auf gar keinen Fall\n\nDas ist Industriepampe par excellence – kein Funken Gottesnahrung in Sicht.")
 
-✅ Folgende Produkte gelten als 100 % Gottesnahrung:
-{', '.join(whitelist)}
+        # Harte Regel: Whitelist
+        elif any(item in clean_input for item in WHITELIST):
+            st.success("✅ Gottesnahrung\n\nRein, ursprünglich, tierisch. Der Himmel öffnet seine Pforten.")
 
-❌ Diese Produkte gelten als absolute Todsünde:
-{', '.join(blacklist)}
+        # Sonst: GPT befragen
+        else:
+            with st.spinner("Bewertung wird geladen..."):
+                prompt = f"""
+Ein Nutzer möchte wissen, ob folgendes Produkt "Gottesnahrung" ist: {eingabe}
 
-Nutze diese Listen zur Einordnung – aber du darfst selbst kreativ entscheiden. Du sprichst wie ein polarisierender Influencer aus der Rohkostszene.
+Beurteile es streng nach den folgenden Prinzipien der rohköstlichen Keto-Elite:
 
-Die Bewertung soll sein:
-- ✅ Gottesnahrung
-- 🤔 Vielleicht
-- ❌ Auf gar keinen Fall
+Whitelist-Kriterien (✅ automatisch positiv):
+- Rohmilch, Rohmilchkäse, Ziegenmilch
+- Tatar, Rindertatar, Leber, Eigelb, Knochenbrühe
+- Fermentiertes Gemüse, selbstgemachtes Sauerkraut, Kimchi
+- Butter, Ghee, Schmalz, tierisches Fett
+- Wildlachs, Sardinen, Makrele (natur)
+- Rohe Eier, rohe tierische Produkte ohne Zusätze
 
-Antworte in **1–2 Sätzen**, witzig, ironisch, manchmal leicht aggressiv.
+Blacklist-Kriterien (❌ automatisch negativ):
+- Marken wie More Nutrition, ESN, Rocka Nutrition
+- Produkte mit Süßstoffen, künstlichen Aromen, Emulgatoren
+- Proteinpulver, Clear Whey, Booster
+- Energy Drinks, Functional Water, Smacktastic
+- Vegane Fleischersatzprodukte, pflanzliche Eiweißquellen, Soja
+- Industrielle Fertigprodukte, Riegel, Gummibärchen, Tütensuppen
+- Produkte mit über 5 Zutaten oder in Plastikverpackung
+
+Bewerte ALLE anderen Produkte nach diesen Prinzipien:
+- Natürlichkeit: je unverarbeiteter, desto besser
+- Tierisch schlägt pflanzlich
+- Zucker, Samenöle, Soja = absolutes No-Go
+- Alles mit mehr als 3 Zutaten = kritisch
+- Verarbeitung, Zusatzstoffe und Verpackung stark negativ
+
+Sprache: ironisch, sarkastisch, bissig – aber erkennbar humorvoll.
+Antwortkategorien:
+✅ Gottesnahrung / 🤔 Vielleicht / ❌ Auf gar keinen Fall
+
+Gib 1 Satz mit Bewertung + 1 kurzen Kommentar zurück (max. 2 Sätze).
 """
+                try:
+                    response = openai.ChatCompletion.create(
+                        model="gpt-3.5-turbo",
+                        messages=[
+                            {"role": "system", "content": "Du bist ein ironischer Rohkost-Keto-Experte."},
+                            {"role": "user", "content": prompt}
+                        ],
+                        temperature=0.9,
+                        max_tokens=120
+                    )
+                    antwort = response.choices[0].message.content.strip()
+                    if antwort.startswith("✅"):
+                        st.success(antwort)
+                    elif antwort.startswith("❌"):
+                        st.error(antwort)
+                    else:
+                        st.warning(antwort)
+                except Exception as e:
+                    st.error(f"Fehler bei der Verarbeitung: {e}")
 
-            user_prompt = f"Ist '{eingabe}' Gottesnahrung?"
-
-            try:
-                response = openai.ChatCompletion.create(
-                    model="gpt-3.5-turbo",
-                    messages=[
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": user_prompt}
-                    ],
-                    temperature=0.85,
-                    max_tokens=150
-                )
-                antwort = response.choices[0].message.content
-
-                # Kategorie-Emoji erkennen für farbige Box
-                if "✅" in antwort:
-                    st.success(antwort)
-                elif "❌" in antwort:
-                    st.error(antwort)
-                else:
-                    st.info(antwort)
-
-                st.divider()
-                st.markdown("📣 **Teilen?** Kopiere das Ergebnis und poste es auf Insta oder X!")
-
-            except Exception as e:
-                st.error(f"Fehler bei der Verarbeitung: {e}")
-
-# === Vorschlagsformular ===
-st.divider()
-st.subheader("🍽️ Fehlt ein Lebensmittel?")
-user_idea = st.text_input("Reiche dein Food ein:", placeholder="z. B. Knäckebrot mit Hüttenkäse")
-if st.button("Vorschlagen"):
-    if user_idea.strip() != "":
-        st.success("Danke! Dein Vorschlag wurde gespeichert (oder an den Entwickler übermittelt).")
-    else:
-        st.warning("Bitte gib einen Vorschlag ein.")
-
-# === Footer ===
+# Fußzeile
 st.markdown("""
 ---
-🌱 Eine ironische App für die Rohkost-Gemeinde. Mit Liebe gebaut von Moritz & GPT.
+🌱 Eine ironische App für die Rohkost-Gemeinde. Gebaut von Moritz & GPT.
 """)
