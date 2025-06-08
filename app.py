@@ -1,16 +1,16 @@
 import streamlit as st
 import openai
 import json
-import os
 
 # === Setup ===
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 st.set_page_config(page_title="Ist das Gottesnahrung?", layout="centered", page_icon="🥩")
 st.title("🥩 Ist das Gottesnahrung?")
 
-# === Blacklist & Whitelist laden ===
+# === Load Whitelist & Blacklist ===
 with open("whitelist.json", "r", encoding="utf-8") as f:
     whitelist = json.load(f)
+
 with open("blacklist.json", "r", encoding="utf-8") as f:
     blacklist = json.load(f)
 
@@ -26,6 +26,7 @@ vorschlaege = [
     "Lachs mit Butter"
 ]
 
+# === Eingabe ===
 eingabe = st.text_input("Gib ein Lebensmittel oder Produkt ein:", placeholder="z. B. Protein Pulver Vanille", value="")
 
 if st.button("Checken"):
@@ -40,26 +41,26 @@ if st.button("Checken"):
     else:
         with st.spinner("Bewertung durch die Rohgang läuft..."):
             prompt = (
-                f"Ein Nutzer möchte wissen, ob folgendes Produkt 'Gottesnahrung' ist: {eingabe}\n"
-                "Bewerte es aus Sicht eines fanatischen Rohkost-Befürworters:\n"
-                "- Natürlich, unverarbeitet = ✅\n"
-                "- Verarbeitet, mit Zusätzen, Samenöl = ❌\n"
-                "- Pflanzlich okay, solange roh und naturbelassen\n"
-                "- Tierisch okay, roh oder traditionell zubereitet (z. B. gekochtes Ei, Steak, Innereien)\n"
-                "- More Nutrition, Booster, Proteinpulver = No-Go\n"
-                "Kategorien: ✅ Gottesnahrung, 🤔 Vielleicht, ❌ Auf gar keinen Fall\n"
-                "Antwort auf Deutsch, Emoji + Kategorie zuerst, dann kurzer ironischer Kommentar."
+                f"Du bist ein humorvoller, leicht radikaler Rohkost-Guru. Ein Nutzer möchte wissen, ob folgendes Produkt ‚Gottesnahrung‘ ist:\n"
+                f"Produkt: {eingabe}\n"
+                "Beurteile es aus Sicht der rohköstlichen, gesundheitsbewussten Szene:\n"
+                "- Erlaubt: Alles, was möglichst unverarbeitet, nährstoffreich und ursprünglich ist. Fleisch, Fisch, Eier, tierische Produkte ohne Zusatzstoffe sind in Ordnung – roh oder schonend zubereitet. Pflanzliche Lebensmittel sind auch gut, solange sie naturbelassen sind.\n"
+                "- Verboten: Produkte mit Zusätzen wie Süßstoffe, Aromen, Emulgatoren, sowie stark verarbeitete Produkte, insbesondere von Marken wie ‚More Nutrition‘, ‚ESN‘ oder ‚Rocka‘.\n"
+                "- Samenöle (z. B. Sonnenblumen-, Raps-, Sojaöl) sind grundsätzlich ❌.\n"
+                "- Wenn unklar, ob Samenöle oder Zusatzstoffe enthalten sind, frage vorsichtig nach (‚Ist da Sonnenblumenöl drin?‘).\n"
+                "Bewerte mit: ✅ Gottesnahrung / 🤔 Vielleicht / ❌ Auf gar keinen Fall\n"
+                "Antworte auf Deutsch. Zuerst das Emoji + Bewertung, dann 1–2 Sätze ironisch, aber mit Substanz."
             )
 
             try:
                 response = openai.ChatCompletion.create(
                     model="gpt-3.5-turbo",
                     messages=[
-                        {"role": "system", "content": "Du bist ein radikaler, ironischer Rohkost-Guru mit Humor."},
+                        {"role": "system", "content": "Du bist ein fanatischer, ironischer Rohkost-Guru."},
                         {"role": "user", "content": prompt}
                     ],
                     temperature=0.85,
-                    max_tokens=100
+                    max_tokens=150
                 )
                 antwort = response.choices[0].message.content
                 if "✅" in antwort:
@@ -68,39 +69,12 @@ if st.button("Checken"):
                     st.error(antwort)
                 else:
                     st.warning(antwort)
+
             except Exception as e:
                 st.error(f"Fehler bei der Verarbeitung: {e}")
-
-# === Community-Vorschlag: lokal speichern ===
-st.markdown("---")
-st.subheader("🍽️ Community-Vorschlag")
-
-food = st.text_input("Lebensmittel einreichen:", placeholder="z. B. Knäckebrot mit Hüttenkäse")
-bewertung = st.selectbox("Deine Einschätzung", ["✅ Gottesnahrung", "🤔 Vielleicht", "❌ Auf gar keinen Fall"])
-
-if st.button("Einreichen"):
-    if food.strip() == "":
-        st.warning("Bitte gib ein Lebensmittel ein.")
-    else:
-        eintrag = {"produkt": food.strip(), "bewertung": bewertung}
-        try:
-            if os.path.exists("community_submissions.json"):
-                with open("community_submissions.json", "r", encoding="utf-8") as f:
-                    daten = json.load(f)
-            else:
-                daten = []
-
-            daten.append(eintrag)
-
-            with open("community_submissions.json", "w", encoding="utf-8") as f:
-                json.dump(daten, f, ensure_ascii=False, indent=2)
-
-            st.success("Danke für deinen Beitrag zur Wahrheit der Nahrung 🙌")
-        except Exception as e:
-            st.error(f"Fehler beim Speichern: {e}")
 
 # === Footer ===
 st.markdown("""
 ---
-🍯 Eine satirische App im Geiste der Rohgang. Gebaut mit 🐍 & ❤️ von Moritz & GPT.
+🍯 #gottesnahrung #rohgang
 """)
